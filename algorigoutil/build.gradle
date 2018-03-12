@@ -6,9 +6,9 @@ publish {
     userOrg = 'chagilhwan'
     groupId = 'com.algorigo.library'
     artifactId = 'AlgorigoUtil'
-    publishVersion = '1.0.2'
-    desc = 'Native Singleton.'
-    website = 'https://github.com/rouddy/NativeSingleton'
+    publishVersion = '1.0.3'
+    desc = 'AlgorigoUtil'
+    website = 'https://github.com/Algorigo/AlgorigoUtils'
     issueTracker = "${website}/issues"
     repository = "${website}.git"
 }
@@ -17,7 +17,7 @@ android {
     compileSdkVersion 26
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 14
         targetSdkVersion 26
         versionCode 1
         versionName publish.publishVersion
