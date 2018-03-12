@@ -7,8 +7,8 @@ publish {
     groupId = 'com.algorigo.library'
     artifactId = 'AlgorigoUtil'
     publishVersion = '1.0.2'
-    desc = 'Native Singleton.'
-    website = 'https://github.com/rouddy/NativeSingleton'
+    desc = 'AlgorigoUtil'
+    website = 'https://github.com/Algorigo/AlgorigoUtils'
     issueTracker = "${website}/issues"
     repository = "${website}.git"
 }
