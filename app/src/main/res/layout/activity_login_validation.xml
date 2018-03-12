@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.algorigo.algorigoutils.LoginValidationActivity">
+
+    <EditText
+        android:id="@+id/emailEdit"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="Email"
+        android:text="test@mail.com"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/clearEmailBtn"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/clearEmailBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="x"
+        android:textSize="24sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/emailEdit"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <EditText
+        android:id="@+id/passwordEdit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="Password"
+        android:text="password"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/clearPasswordBtn"
+        app:layout_constraintLeft_toLeftOf="@+id/emailEdit"
+        app:layout_constraintTop_toBottomOf="@+id/emailEdit" />
+
+    <Button
+        android:id="@+id/clearPasswordBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="x"
+        android:textSize="24sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/passwordEdit"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/validationResultView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text=" "
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="@+id/passwordEdit"
+        app:layout_constraintRight_toRightOf="@+id/passwordEdit"
+        app:layout_constraintTop_toBottomOf="@+id/passwordEdit" />
+
+</android.support.constraint.ConstraintLayout>
