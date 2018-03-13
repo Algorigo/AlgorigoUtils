@@ -20,59 +20,59 @@ object DateTimeUtil {
         SUNDAY(7)
     }
 
-    fun getDateTimeStringWithPattern(dateTime: DateTime, pattern: String): String {
+    @JvmOverloads fun getDateTimeStringWithPattern(dateTime: DateTime, pattern: String): String {
         val dateTimeFormat = DateTimeFormat.forPattern(pattern)
         val str = dateTimeFormat.print(dateTime)
         return str
     }
 
-    fun getMediumDateTimeString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getMediumDateTimeString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
         val dateTimeFormat = DateTimeFormat.mediumDateTime().withLocale(locale)
         val str = dateTime.toString(dateTimeFormat)
         return str
     }
 
-    fun getShortDateTimeString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getShortDateTimeString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
         val dateTimeFormat = DateTimeFormat.shortDateTime().withLocale(locale)
         val str = dateTime.toString(dateTimeFormat)
         return str
     }
 
-    fun getMediumDateString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getMediumDateString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
         return getMediumDateString(dateTime.toLocalDate(), locale)
     }
 
-    fun getMediumDateString(localDate: LocalDate, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getMediumDateString(localDate: LocalDate, locale: Locale = Locale.getDefault()): String {
         val dateFormat = DateTimeFormat.mediumDate().withLocale(locale)
         val str = localDate.toString(dateFormat)
         return str
     }
 
-    fun getShortDateString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getShortDateString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
         return getShortDateString(dateTime.toLocalDate(), locale)
     }
 
-    fun getShortDateString(localDate: LocalDate, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getShortDateString(localDate: LocalDate, locale: Locale = Locale.getDefault()): String {
         val dateFormat = DateTimeFormat.shortDate().withLocale(locale)
         val str = localDate.toString(dateFormat)
         return str
     }
 
-    fun getMediumTimeString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getMediumTimeString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
         return getMediumTimeString(dateTime.toLocalTime(), locale)
     }
 
-    fun getMediumTimeString(localTime: LocalTime, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getMediumTimeString(localTime: LocalTime, locale: Locale = Locale.getDefault()): String {
         val timeFormat = DateTimeFormat.mediumTime().withLocale(locale)
         val str = localTime.toString(timeFormat)
         return str
     }
 
-    fun getShortTimeString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getShortTimeString(dateTime: DateTime, locale: Locale = Locale.getDefault()): String {
         return getShortTimeString(dateTime.toLocalTime(), locale)
     }
 
-    fun getShortTimeString(localTime: LocalTime, locale: Locale = Locale.getDefault()): String {
+    @JvmOverloads fun getShortTimeString(localTime: LocalTime, locale: Locale = Locale.getDefault()): String {
         val timeFormat = DateTimeFormat.shortTime().withLocale(locale)
         val str = localTime.toString(timeFormat)
         return str
@@ -83,7 +83,7 @@ object DateTimeUtil {
         return lastDayOfMonth.toLocalDate()
     }
 
-    fun getFirstDayOfWeek(dateTime: DateTime, firstDay: DayOfWeek = DayOfWeek.SUNDAY): LocalDate {
+    @JvmOverloads fun getFirstDayOfWeek(dateTime: DateTime, firstDay: DayOfWeek = DayOfWeek.SUNDAY): LocalDate {
         var firstDayOfWeek = dateTime.withDayOfWeek(firstDay.value)
         if (firstDayOfWeek.isAfter(dateTime)) {
             firstDayOfWeek = firstDayOfWeek.minusDays(7)
@@ -91,7 +91,7 @@ object DateTimeUtil {
         return firstDayOfWeek.toLocalDate()
     }
 
-    fun getLastDayOfWeek(dateTime: DateTime, firstDay: DayOfWeek = DayOfWeek.SUNDAY): LocalDate {
+    @JvmOverloads fun getLastDayOfWeek(dateTime: DateTime, firstDay: DayOfWeek = DayOfWeek.SUNDAY): LocalDate {
         var weekNum = if (firstDay == DayOfWeek.MONDAY) DayOfWeek.SUNDAY.value else firstDay.value-1
         var lastDayOfWeek = dateTime.withDayOfWeek(weekNum)
         if (lastDayOfWeek.isBefore(dateTime)) {
