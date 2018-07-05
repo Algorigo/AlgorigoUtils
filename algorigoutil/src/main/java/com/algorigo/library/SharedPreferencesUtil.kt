@@ -55,4 +55,34 @@ object SharedPreferencesUtil {
     fun getSet(key: String): Set<String> {
         return weakReference!!.get()!!.getSharedPreferences(STORAGE_KEY, 0).getStringSet(key, HashSet())
     }
+
+    fun setString(prefKey: String, key: String, value: String) {
+        val editor = weakReference!!.get()!!.getSharedPreferences(prefKey, 0).edit()
+        editor.putString(key, value)
+        editor.apply()
+    }
+
+    fun getString(prefKey: String, key: String): String {
+        return weakReference!!.get()!!.getSharedPreferences(prefKey, 0).getString(key, "")
+    }
+
+    fun setBoolean(prefKey: String, key: String, value: Boolean) {
+        val editor = weakReference!!.get()!!.getSharedPreferences(prefKey, 0).edit()
+        editor.putBoolean(key, value)
+        editor.apply()
+    }
+
+    fun getBoolean(prefKey: String, key: String): Boolean {
+        return weakReference!!.get()!!.getSharedPreferences(prefKey, 0).getBoolean(key, false)
+    }
+
+    fun setInt(prefKey: String, key: String, value: Int) {
+        val editor = weakReference!!.get()!!.getSharedPreferences(prefKey, 0).edit()
+        editor.putInt(key, value)
+        editor.apply()
+    }
+
+    fun getInt(prefKey: String, key: String): Int {
+        return weakReference!!.get()!!.getSharedPreferences(prefKey, 0).getInt(key, 0)
+    }
 }
