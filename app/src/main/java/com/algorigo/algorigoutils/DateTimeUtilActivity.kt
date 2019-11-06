@@ -1,9 +1,9 @@
 package com.algorigo.algorigoutils
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
+import androidx.appcompat.app.AppCompatActivity
 import com.algorigo.library.DateTimeUtil
 import kotlinx.android.synthetic.main.activity_datetimeutil.*
 import org.joda.time.DateTime
