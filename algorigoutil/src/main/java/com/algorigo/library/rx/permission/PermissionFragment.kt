@@ -1,0 +1,39 @@
+package com.algorigo.library.rx.permission
+
+import androidx.fragment.app.Fragment
+import io.reactivex.Completable
+import io.reactivex.subjects.Subject
+
+abstract class PermissionFragment : Fragment(), RxPermissions {
+
+    private var requestCodeMap = mutableMapOf<Int, Subject<Int>>()
+
+    override fun requestPermissionCompletable(permissions: Array<String>, showRequestPermissionRationale: ((Array<String>) -> Completable)?): Completable
+            = PermissionMethods.requestPermissionCompletable(
+        activity!!,
+        requestCodeMap,
+        permissions,
+        this::requestPermissionsInner,
+        showRequestPermissionRationale
+    )
+
+    private fun requestPermissionsInner(permissions: Array<String>, requestCode: Int)
+            = PermissionMethods.requestPermissions(
+        activity!!,
+        permissions,
+        requestCode,
+        this::onRequestPermissionsResult
+    )
+
+    final override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (!PermissionMethods.onRequestPermissionsResult(
+                requestCodeMap,
+                requestCode,
+                permissions,
+                grantResults
+            )
+        ) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+}
