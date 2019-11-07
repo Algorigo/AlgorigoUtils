@@ -20,7 +20,7 @@ object DateTimeUtil {
         SUNDAY(7)
     }
 
-    @JvmOverloads fun getDateTimeStringWithPattern(dateTime: DateTime, pattern: String): String {
+    fun getDateTimeStringWithPattern(dateTime: DateTime, pattern: String): String {
         val dateTimeFormat = DateTimeFormat.forPattern(pattern)
         val str = dateTimeFormat.print(dateTime)
         return str
@@ -92,7 +92,7 @@ object DateTimeUtil {
     }
 
     @JvmOverloads fun getLastDayOfWeek(dateTime: DateTime, firstDay: DayOfWeek = DayOfWeek.SUNDAY): LocalDate {
-        var weekNum = if (firstDay == DayOfWeek.MONDAY) DayOfWeek.SUNDAY.value else firstDay.value-1
+        val weekNum = if (firstDay == DayOfWeek.MONDAY) DayOfWeek.SUNDAY.value else firstDay.value-1
         var lastDayOfWeek = dateTime.withDayOfWeek(weekNum)
         if (lastDayOfWeek.isBefore(dateTime)) {
             lastDayOfWeek = lastDayOfWeek.plusDays(7)
