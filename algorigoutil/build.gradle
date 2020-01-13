@@ -6,7 +6,7 @@ publish {
     userOrg = 'chagilhwan'
     groupId = 'com.algorigo.library'
     artifactId = 'AlgorigoUtil'
-    publishVersion = '1.0.10'
+    publishVersion = '1.1.0'
     desc = 'AlgorigoUtil'
     website = 'https://github.com/Algorigo/AlgorigoUtils'
     issueTracker = "${website}/issues"
