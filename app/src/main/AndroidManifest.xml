@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DateTimeUtilActivity"></activity>
+        <activity android:name=".WifiActivity" />
+        <activity android:name=".DateTimeUtilActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,7 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginValidationActivity"></activity>
+        <activity android:name=".LoginValidationActivity" />
     </application>
 
 </manifest>

@@ -19,5 +19,9 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, LoginValidationActivity::class.java)
             startActivity(intent)
         }
+        wifiBtn.setOnClickListener {
+            val intent = Intent(this, WifiActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

@@ -28,4 +28,15 @@
         app:layout_constraintRight_toRightOf="@id/dateTimeUtilBtn"
         app:layout_constraintTop_toBottomOf="@+id/dateTimeUtilBtn" />
 
+    <Button
+        android:id="@+id/wifiBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Wifi"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="@id/loginValidationBtn"
+        app:layout_constraintRight_toRightOf="@id/loginValidationBtn"
+        app:layout_constraintTop_toBottomOf="@+id/loginValidationBtn" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
