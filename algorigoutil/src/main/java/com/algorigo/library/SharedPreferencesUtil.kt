@@ -52,6 +52,10 @@ object SharedPreferencesUtil {
         return context.getSharedPreferences(STORAGE_KEY, 0).getStringSet(key, HashSet())!!
     }
 
+    fun containKey(context: Context, key: String): Boolean {
+        return context.getSharedPreferences(STORAGE_KEY, 0).contains(key)
+    }
+
     fun setString(context: Context, prefKey: String, key: String, value: String) {
         val editor = context.getSharedPreferences(prefKey, 0).edit()
         editor.putString(key, value)
@@ -80,5 +84,9 @@ object SharedPreferencesUtil {
 
     fun getInt(context: Context, prefKey: String, key: String): Int {
         return context.getSharedPreferences(prefKey, 0).getInt(key, 0)
+    }
+
+    fun containKey(context: Context, prefKey: String, key: String): Boolean {
+        return context.getSharedPreferences(prefKey, 0).contains(key)
     }
 }
