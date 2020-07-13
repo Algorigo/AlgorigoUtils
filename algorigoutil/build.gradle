@@ -28,10 +28,6 @@ android {
             consumerProguardFiles 'lib-proguard-rules.txt'
         }
     }
-
-    lintOptions {
-        disable 'MissingPermission'
-    }
 }
 
 dependencies {

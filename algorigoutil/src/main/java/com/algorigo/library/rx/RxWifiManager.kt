@@ -96,14 +96,18 @@ object RxWifiManager {
                 }
                 var netId = wifiManager.addNetwork(wifiConfig)
                 if (netId < 0) {
-                    val network = if (password.isNotEmpty()) {
-                        wifiManager.configuredNetworks.filter {
-                            it.SSID.equals("\"$ssid\"") && it.preSharedKey != null
-                        }.lastOrNull()
-                    } else {
-                        wifiManager.configuredNetworks.filter {
-                            it.SSID.equals("\"$ssid\"") && it.preSharedKey == null
-                        }.lastOrNull()
+                    val network = try {
+                        if (password.isNotEmpty()) {
+                            wifiManager.configuredNetworks.filter {
+                                it.SSID.equals("\"$ssid\"") && it.preSharedKey != null
+                            }.lastOrNull()
+                        } else {
+                            wifiManager.configuredNetworks.filter {
+                                it.SSID.equals("\"$ssid\"") && it.preSharedKey == null
+                            }.lastOrNull()
+                        }
+                    } catch (e: SecurityException) {
+                        null
                     }
                     netId = network?.networkId ?: -1
                 }
@@ -127,8 +131,13 @@ object RxWifiManager {
     fun remove(context: Context, ssid: String): Completable {
         return Completable.create {
             val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            val networks = wifiManager.configuredNetworks.filter {
-                it.SSID.equals("\"$ssid\"")
+            val networks = try {
+                wifiManager.configuredNetworks.filter {
+                    it.SSID.equals("\"$ssid\"")
+                }
+            } catch (e: SecurityException) {
+                it.onError(e)
+                return@create
             }
 
             var result = wifiManager.disconnect()
