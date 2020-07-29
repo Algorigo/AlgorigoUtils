@@ -9,23 +9,15 @@ import android.net.NetworkInfo
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
-import android.os.Build
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 
-@Deprecated("WifiManager is deprecated from android Q")
-@Suppress("DEPRECATION")
 object RxWifiManager {
 
-    class WifiManagerDeprecatedFromAndroidQException : Throwable("WifiManager is deprecated from android Q")
     class WifiNetworkAddFailed : Throwable("addNetwork return -1")
 
     fun scan(context: Context, only24GHz: Boolean = true): Single<List<ScanResult>> {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return Single.error(WifiManagerDeprecatedFromAndroidQException())
-        }
-
         val subject = PublishSubject.create<List<ScanResult>>()
         val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val receiver = object : BroadcastReceiver() {
@@ -59,10 +51,6 @@ object RxWifiManager {
     }
 
     fun connect(context: Context, ssid: String, password: String): Completable {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return Completable.error(WifiManagerDeprecatedFromAndroidQException())
-        }
-
         val subject = PublishSubject.create<Int>()
         val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (wifiManager.connectionInfo.ssid.equals("\"$ssid\"")) {
@@ -140,10 +128,6 @@ object RxWifiManager {
     }
 
     fun remove(context: Context, ssid: String): Completable {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return Completable.error(WifiManagerDeprecatedFromAndroidQException())
-        }
-
         return Completable.create {
             val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
             val networks = try {
