@@ -33,8 +33,8 @@ publishing {
 }
 
 bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
+    user = project.property("BINTRAY_USER") ?: System.getenv('BINTRAY_USER')
+    key = project.property("BINTRAY_KEY") ?: System.getenv('BINTRAY_KEY')
     publications = ['AlgorigoUtil']
     configurations = ['archives']
     override = true
