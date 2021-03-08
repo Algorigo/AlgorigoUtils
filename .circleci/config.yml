@@ -1,40 +1,45 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/code
-    docker:
-      - image: circleci/android:api-28
-    environment:
-      JVM_OPTS: -Xmx3200m
+    machine:
+      image: android:202102-01
     steps:
-      - checkout
-      - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-      - run:
-          name: Approve license for build tools
-          command: (echo y; echo y; echo y; echo y; echo y; echo y) | $ANDROID_HOME/tools/bin/sdkmanager --licenses
-      - run:
-          name: Build
-          command: ./gradlew build
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-      - run:
-          name: Run Tests
-          command: ./gradlew lint test
-      - store_artifacts:
-          path: algorigoutil/build/reports
-          destination: reports
-      - store_test_results:
-          path: algorigoutil/build/test-results
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+    - checkout
+    - run:
+        command: |
+          sdkmanager "system-images;android-29;default;x86"
+        name: Install system image "system-images;android-29;default;x86"
+    - run:
+        command: |
+          find . -name 'build.gradle' | sort | xargs cat |
+          shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+        name: Generate cache checksum
+    - restore_cache:
+        key: gradle-v1a-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+        name: Restore gradle cache
+    - run:
+        command: |
+          ./gradlew build
+        name: 'Run: ./gradlew build'
+    - save_cache:
+        key: gradle-v1a-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+        name: Save gradle cache
+        paths:
+        - ~/.gradle/caches
+        - ~/.gradle/wrapper
+    - store_artifacts:
+        path: algorigoutil/build/reports
+        destination: reports
+    - store_test_results:
+        path: algorigoutil/build/test-results
+    - persist_to_workspace:
+        root: .
+        paths:
+          - .
+    resource_class: medium
   deploy:
-    docker:
-      - image: circleci/android:api-28
+    machine:
+      image: android:202102-01
     working_directory: ~/code
     steps:
       - attach_workspace:
@@ -47,11 +52,11 @@ workflows:
   version: 2
   build_deploy:
     jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
+    - build
+    - deploy:
+        requires:
+          - build
+        filters:
+          branches:
+            only:
+              - master
