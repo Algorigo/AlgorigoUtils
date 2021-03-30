@@ -61,7 +61,7 @@ object RxWifiManager {
             override fun onReceive(con: Context?, intent: Intent?) {
                 if (intent?.action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
                     val networkInfo = intent.getParcelableExtra<NetworkInfo>(WifiManager.EXTRA_NETWORK_INFO)
-                    if (networkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED && networkInfo.type == ConnectivityManager.TYPE_WIFI) {
+                    if (networkInfo?.detailedState == NetworkInfo.DetailedState.CONNECTED && networkInfo.type == ConnectivityManager.TYPE_WIFI) {
                         val info = wifiManager.connectionInfo
                         if (info.ssid.equals("\"$ssid\"") && !subject.hasComplete() && !subject.hasThrowable() && subject.hasObservers()) {
                             subject.onComplete()
