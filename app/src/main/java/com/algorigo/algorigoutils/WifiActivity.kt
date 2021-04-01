@@ -42,7 +42,7 @@ class WifiActivity : PermissionAppCompatActivity() {
     }
 
     private fun scan() {
-        requestPermissionCompletable(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
+        requestPermissionCompletable(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION))
                 .andThen(RxWifiManager.scan(this, false))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
