@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import com.algorigo.library.rx.RxWifiManager
 import com.algorigo.library.rx.permission.PermissionAppCompatActivity
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_wifi.*
 
 class WifiActivity : PermissionAppCompatActivity() {
@@ -42,7 +42,7 @@ class WifiActivity : PermissionAppCompatActivity() {
     }
 
     private fun scan() {
-        requestPermissionCompletable(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
+        requestPermissionCompletable(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION))
                 .andThen(RxWifiManager.scan(this, false))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
