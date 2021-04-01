@@ -1,6 +1,6 @@
 package com.algorigo.library.rx.permission
 
-import io.reactivex.Completable
+import io.reactivex.rxjava3.core.Completable
 
 internal interface RxPermissions {
 

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import com.algorigo.library.rx.RxWifiManager
 import com.algorigo.library.rx.permission.PermissionAppCompatActivity
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_wifi.*
 
 class WifiActivity : PermissionAppCompatActivity() {

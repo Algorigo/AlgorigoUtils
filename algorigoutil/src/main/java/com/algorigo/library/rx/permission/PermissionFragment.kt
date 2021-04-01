@@ -1,8 +1,8 @@
 package com.algorigo.library.rx.permission
 
 import androidx.fragment.app.Fragment
-import io.reactivex.Completable
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.subjects.Subject
 
 abstract class PermissionFragment : Fragment(), RxPermissions {
 
