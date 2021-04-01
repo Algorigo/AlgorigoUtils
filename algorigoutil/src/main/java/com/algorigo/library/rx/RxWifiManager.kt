@@ -9,9 +9,9 @@ import android.net.NetworkInfo
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.subjects.PublishSubject
 
 object RxWifiManager {
 

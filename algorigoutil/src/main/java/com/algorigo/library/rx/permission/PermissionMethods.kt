@@ -5,10 +5,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
 import androidx.core.app.ActivityCompat
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.Subject
 
 internal object PermissionMethods {
 
