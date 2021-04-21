@@ -7,6 +7,7 @@ import android.util.Log
 import com.algorigo.library.rx.RxWifiManager
 import com.algorigo.library.rx.permission.PermissionAppCompatActivity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_wifi.*
 
 class WifiActivity : PermissionAppCompatActivity() {
@@ -19,6 +20,7 @@ class WifiActivity : PermissionAppCompatActivity() {
             passwordEdit.setText("")
         }
     })
+    private var connectDisposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,22 +56,24 @@ class WifiActivity : PermissionAppCompatActivity() {
     }
 
     private fun connect(scanResult: ScanResult) {
-        requestPermissionCompletable(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
-                .andThen(RxWifiManager.connect(this, scanResult.SSID, passwordEdit.text.toString()))
+        if (connectDisposable != null) {
+            return
+        }
+
+        connectDisposable = requestPermissionCompletable(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION))
+                .andThen(RxWifiManager.connectWifi(this, scanResult.SSID, passwordEdit.text.toString()))
+                .doFinally {
+                    connectDisposable = null
+                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Log.e("!!!", "onConnect")
                 }, {
-                    Log.e("!!!", "error2", it)
+                    Log.e("!!!", "error4", it)
                 })
     }
 
     private fun remove(scanResult: ScanResult) {
-        RxWifiManager.remove(this, scanResult.SSID)
-                .subscribe({
-                    Log.e("!!!", "onRemove")
-                }, {
-                    Log.e("!!!", "error3", it)
-                })
+        connectDisposable?.dispose()
     }
 }
