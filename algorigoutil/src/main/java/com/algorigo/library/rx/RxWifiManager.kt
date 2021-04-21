@@ -4,18 +4,26 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import android.net.wifi.ScanResult
-import android.net.wifi.WifiConfiguration
-import android.net.wifi.WifiManager
+import android.net.*
+import android.net.wifi.*
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
 
 object RxWifiManager {
 
     class WifiNetworkAddFailed : Throwable("addNetwork return -1")
+    class RemoveWifiOwnerException : Throwable("Wifi is not added by this application")
+
+    enum class Connectivity {
+        CONNECTED,
+    }
+
+    private val LOG_TAG = RxWifiManager::class.java.simpleName
 
     fun scan(context: Context, only24GHz: Boolean = true): Single<List<ScanResult>> {
         val subject = PublishSubject.create<List<ScanResult>>()
@@ -36,7 +44,7 @@ object RxWifiManager {
         return subject
             .firstOrError()
             .doOnSubscribe {
-                context.registerReceiver(receiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+                context.applicationContext.registerReceiver(receiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
                 if (!wifiManager.isWifiEnabled) {
                     wifiManager.isWifiEnabled = true
                 }
@@ -46,10 +54,100 @@ object RxWifiManager {
             }
             .doFinally {
                 loop = false
-                context.unregisterReceiver(receiver)
+                context.applicationContext.unregisterReceiver(receiver)
             }
     }
 
+
+    fun connectWifi(context: Context, ssid: String, password: String): Observable<Connectivity> {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            connectWifiOverQ(context, ssid, password)
+        } else {
+            var subject = PublishSubject.create<Connectivity>()
+            connect(context, ssid, password)
+                    .andThen(Single.just(Connectivity.CONNECTED))
+                    .toObservable()
+                    .concatWith(subject)
+                    .doFinally {
+                        remove(context, ssid)
+                                .subscribe({
+                                    Log.i(LOG_TAG, "Remove Successfully")
+                                }, {
+                                    Log.e(LOG_TAG, "", it)
+                                })
+                    }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun connectWifiOverQ(context: Context, ssid: String, password: String): Observable<Connectivity> {
+        val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+        return if (connectivityManager != null) {
+            val subject = PublishSubject.create<Connectivity>()
+            val callback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    super.onAvailable(network)
+                    Log.e("!!!", "onAvailable:$network")
+                    subject.onNext(Connectivity.CONNECTED)
+                }
+
+                override fun onLosing(network: Network, maxMsToLive: Int) {
+                    super.onLosing(network, maxMsToLive)
+                    Log.e("!!!", "onLosing:$network")
+                }
+
+                override fun onLost(network: Network) {
+                    super.onLost(network)
+                    Log.e("!!!", "onLost:$network")
+                    subject.onError(WifiNetworkAddFailed())
+                }
+
+                override fun onUnavailable() {
+                    super.onUnavailable()
+                    Log.e("!!!", "onUnavailable")
+                    subject.onError(WifiNetworkAddFailed())
+                }
+
+                override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+                    super.onCapabilitiesChanged(network, networkCapabilities)
+                    Log.e("!!!", "onCapabilitiesChanged:$network, $networkCapabilities")
+                }
+
+                override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+                    super.onLinkPropertiesChanged(network, linkProperties)
+                    Log.e("!!!", "onLinkPropertiesChanged:$network, $linkProperties")
+                }
+
+                override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
+                    super.onBlockedStatusChanged(network, blocked)
+                    Log.e("!!!", "onBlockedStatusChanged:$network, $blocked")
+                }
+            }
+
+            val specifier = WifiNetworkSpecifier.Builder()
+                    .setSsid(ssid)
+                    .setWpa2Passphrase(password)
+                    .build()
+            val request = NetworkRequest.Builder()
+                    .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                    .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .setNetworkSpecifier(specifier)
+                    .build()
+
+            subject
+                    .doOnSubscribe {
+                        connectivityManager.requestNetwork(request, callback)
+                    }
+                    .doFinally {
+                        connectivityManager.unregisterNetworkCallback(callback)
+                    }
+        } else {
+            Observable.error(NullPointerException())
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated("deprecated in Android Q")
     fun connect(context: Context, ssid: String, password: String): Completable {
         val subject = PublishSubject.create<Int>()
         val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -74,7 +172,7 @@ object RxWifiManager {
         return subject
             .ignoreElements()
             .doOnSubscribe {
-                context.registerReceiver(receiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
+                context.applicationContext.registerReceiver(receiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
                 if (!wifiManager.isWifiEnabled) {
                     wifiManager.isWifiEnabled = true
                 }
@@ -123,10 +221,12 @@ object RxWifiManager {
                 }
             }
             .doFinally {
-                context.unregisterReceiver(receiver)
+                context.applicationContext.unregisterReceiver(receiver)
             }
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("deprecated in Android Q")
     fun remove(context: Context, ssid: String): Completable {
         return Completable.create {
             val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -139,16 +239,29 @@ object RxWifiManager {
                 return@create
             }
 
-            var result = wifiManager.disconnect()
+            val disconnectResult = wifiManager.disconnect()
+            if (!disconnectResult) {
+                it.onError(RemoveWifiOwnerException())
+                return@create
+            }
+
+            var removeResult = true
             for (network in networks) {
-                result = result and wifiManager.removeNetwork(network.networkId)
+                removeResult = removeResult and wifiManager.removeNetwork(network.networkId)
             }
-            result = result and wifiManager.reconnect()
-            if (!result) {
+
+            val reconnectResult = wifiManager.reconnect()
+            if (!reconnectResult) {
                 it.onError(WifiNetworkAddFailed())
-            } else {
-                it.onComplete()
+                return@create
             }
+
+            if (!removeResult) {
+                it.onError(RemoveWifiOwnerException())
+                return@create
+            }
+
+            it.onComplete()
         }
     }
 }
