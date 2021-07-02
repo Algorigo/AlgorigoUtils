@@ -88,6 +88,7 @@ object RxWifiManager {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
                     Log.e("!!!", "onAvailable:$network")
+                    connectivityManager.bindProcessToNetwork(network)
                     subject.onNext(Connectivity.CONNECTED)
                 }
 
