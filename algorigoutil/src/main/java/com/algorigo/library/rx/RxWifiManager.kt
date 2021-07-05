@@ -141,6 +141,11 @@ object RxWifiManager {
                     }
                     .doFinally {
                         connectivityManager.unregisterNetworkCallback(callback)
+
+                        val network = connectivityManager?.activeNetwork
+                        val result = connectivityManager?.bindProcessToNetwork(network)
+
+                        Log.e(LOG_TAG, "unregister bindProcessToNetwork result:$result")
                     }
         } else {
             Observable.error(NullPointerException())
