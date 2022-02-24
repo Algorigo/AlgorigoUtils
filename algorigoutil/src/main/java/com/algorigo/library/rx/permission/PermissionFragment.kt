@@ -10,7 +10,7 @@ abstract class PermissionFragment : Fragment(), RxPermissions {
 
     override fun requestPermissionCompletable(permissions: Array<String>, showRequestPermissionRationale: ((Array<String>) -> Completable)?): Completable
             = PermissionMethods.requestPermissionCompletable(
-        activity!!,
+        requireActivity(),
         requestCodeMap,
         permissions,
         this::requestPermissionsInner,
@@ -19,7 +19,7 @@ abstract class PermissionFragment : Fragment(), RxPermissions {
 
     private fun requestPermissionsInner(permissions: Array<String>, requestCode: Int)
             = PermissionMethods.requestPermissions(
-        activity!!,
+        requireActivity(),
         permissions,
         requestCode,
         this::onRequestPermissionsResult

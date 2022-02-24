@@ -11,6 +11,9 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 object Rx2ServiceBindingFactory {
+
+    class Disconnected : RuntimeException()
+
     fun <B : Binder> bind(context: Context, intent: Intent): Observable<B> {
         return bind(
             context,
@@ -29,12 +32,13 @@ object Rx2ServiceBindingFactory {
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
+                subject.onError(Disconnected())
             }
         }
 
         return subject.doOnSubscribe {
             context.bindService(intent, serviceConnection, flags)
-        }.doFinally {
+        }.doOnDispose {
             context.unbindService(serviceConnection)
         }
     }
