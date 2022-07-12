@@ -9,6 +9,7 @@ import android.net.wifi.*
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -20,7 +21,7 @@ object RxWifiManager {
     class RemoveWifiOwnerException : Throwable("Wifi is not added by this application")
 
     enum class Connectivity {
-        CONNECTED,
+        CONNECTED, DISCONNECTED
     }
 
     private val LOG_TAG = RxWifiManager::class.java.simpleName
@@ -87,41 +88,18 @@ object RxWifiManager {
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    Log.e("!!!", "onAvailable:$network")
                     connectivityManager.bindProcessToNetwork(network)
                     subject.onNext(Connectivity.CONNECTED)
                 }
 
-                override fun onLosing(network: Network, maxMsToLive: Int) {
-                    super.onLosing(network, maxMsToLive)
-                    Log.e("!!!", "onLosing:$network")
-                }
-
                 override fun onLost(network: Network) {
                     super.onLost(network)
-                    Log.e("!!!", "onLost:$network")
                     subject.onError(WifiNetworkAddFailed())
                 }
 
                 override fun onUnavailable() {
                     super.onUnavailable()
-                    Log.e("!!!", "onUnavailable")
                     subject.onError(WifiNetworkAddFailed())
-                }
-
-                override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-                    super.onCapabilitiesChanged(network, networkCapabilities)
-                    Log.e("!!!", "onCapabilitiesChanged:$network, $networkCapabilities")
-                }
-
-                override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-                    super.onLinkPropertiesChanged(network, linkProperties)
-                    Log.e("!!!", "onLinkPropertiesChanged:$network, $linkProperties")
-                }
-
-                override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
-                    super.onBlockedStatusChanged(network, blocked)
-                    Log.e("!!!", "onBlockedStatusChanged:$network, $blocked")
                 }
             }
 
@@ -150,6 +128,37 @@ object RxWifiManager {
         } else {
             Observable.error(NullPointerException())
         }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun checkWifiConnectedObservable(context: Context): Observable<Connectivity> {
+        val relay = PublishRelay.create<Connectivity>()
+        val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                relay.accept(Connectivity.CONNECTED)
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                relay.accept(Connectivity.DISCONNECTED)
+            }
+        }
+        val networkRequest = NetworkRequest
+            .Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .build()
+
+        return relay
+            .doOnSubscribe {
+                connectivityManager?.requestNetwork(networkRequest, callback)
+            }
+            .doFinally {
+                connectivityManager?.unregisterNetworkCallback(callback)
+            }
     }
 
     @Suppress("DEPRECATION")
