@@ -88,41 +88,18 @@ object RxWifiManager {
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    Log.e("!!!", "onAvailable:$network")
                     connectivityManager.bindProcessToNetwork(network)
                     subject.onNext(Connectivity.CONNECTED)
                 }
 
-                override fun onLosing(network: Network, maxMsToLive: Int) {
-                    super.onLosing(network, maxMsToLive)
-                    Log.e("!!!", "onLosing:$network")
-                }
-
                 override fun onLost(network: Network) {
                     super.onLost(network)
-                    Log.e("!!!", "onLost:$network")
                     subject.onError(WifiNetworkAddFailed())
                 }
 
                 override fun onUnavailable() {
                     super.onUnavailable()
-                    Log.e("!!!", "onUnavailable")
                     subject.onError(WifiNetworkAddFailed())
-                }
-
-                override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-                    super.onCapabilitiesChanged(network, networkCapabilities)
-                    Log.e("!!!", "onCapabilitiesChanged:$network, $networkCapabilities")
-                }
-
-                override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-                    super.onLinkPropertiesChanged(network, linkProperties)
-                    Log.e("!!!", "onLinkPropertiesChanged:$network, $linkProperties")
-                }
-
-                override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
-                    super.onBlockedStatusChanged(network, blocked)
-                    Log.e("!!!", "onBlockedStatusChanged:$network, $blocked")
                 }
             }
 
@@ -162,39 +139,12 @@ object RxWifiManager {
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                Log.e("!!!", "onAvailable:$network")
                 relay.accept(Connectivity.CONNECTED)
-            }
-
-            override fun onLosing(network: Network, maxMsToLive: Int) {
-                super.onLosing(network, maxMsToLive)
-                Log.e("!!!", "onLosing:$network")
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                Log.e("!!!", "onLost:$network")
                 relay.accept(Connectivity.DISCONNECTED)
-            }
-
-            override fun onUnavailable() {
-                super.onUnavailable()
-                Log.e("!!!", "onUnavailable")
-            }
-
-            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-                super.onCapabilitiesChanged(network, networkCapabilities)
-                Log.e("!!!", "onCapabilitiesChanged:$network, $networkCapabilities")
-            }
-
-            override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-                super.onLinkPropertiesChanged(network, linkProperties)
-                Log.e("!!!", "onLinkPropertiesChanged:$network, $linkProperties")
-            }
-
-            override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
-                super.onBlockedStatusChanged(network, blocked)
-                Log.e("!!!", "onBlockedStatusChanged:$network, $blocked")
             }
         }
         val networkRequest = NetworkRequest
