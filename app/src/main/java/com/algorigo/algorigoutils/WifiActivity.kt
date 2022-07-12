@@ -2,8 +2,11 @@ package com.algorigo.algorigoutils
 
 import android.Manifest
 import android.net.wifi.ScanResult
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.algorigo.library.rx.RxWifiManager
 import com.algorigo.library.rx.permission.PermissionAppCompatActivity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -21,10 +24,14 @@ class WifiActivity : PermissionAppCompatActivity() {
         }
     })
     private var connectDisposable: Disposable? = null
+    private var checkWifiConnectedDisposable: Disposable? = null
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wifi)
+
+        checkWifiConnected()
 
         wifiList.adapter = wifiAdapter
 
@@ -41,6 +48,42 @@ class WifiActivity : PermissionAppCompatActivity() {
                 remove(it)
             }
         }
+    }
+
+    override fun onDestroy() {
+        checkWifiConnectedDisposable?.dispose()
+        super.onDestroy()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun checkWifiConnected() {
+        if (checkWifiConnectedDisposable != null) {
+            return
+        }
+
+        checkWifiConnectedDisposable = RxWifiManager
+            .checkWifiConnectedObservable(this@WifiActivity)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
+                checkWifiConnectedDisposable = null
+            }
+            .subscribe({ connectivity ->
+                when (connectivity) {
+                    RxWifiManager.Connectivity.CONNECTED -> {
+                        Toast
+                            .makeText(this@WifiActivity, "wifi connection is connected", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    RxWifiManager.Connectivity.DISCONNECTED -> {
+                        Toast
+                            .makeText(this@WifiActivity, "wifi connection is disconnected", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    else -> throw IllegalArgumentException("connectivity is not found")
+                }
+            }, {
+                Log.e("!!!", "error", it)
+            })
     }
 
     private fun scan() {
