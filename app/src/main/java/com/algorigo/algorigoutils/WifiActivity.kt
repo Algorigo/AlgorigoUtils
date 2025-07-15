@@ -8,13 +8,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.algorigo.algorigoutils.databinding.ActivityWifiBinding
+import com.algorigo.library.rx.PermissionRequester
 import com.algorigo.library.rx.RxWifiManager
-import com.tbruyelle.rxpermissions3.RxPermissions
+import com.algorigo.library.rx.registerPermissionRequester
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_wifi.*
 
 class WifiActivity : AppCompatActivity() {
 
@@ -22,34 +21,39 @@ class WifiActivity : AppCompatActivity() {
     private val wifiAdapter = WifiAdapter(object : WifiAdapter.OnItemClickListener {
         override fun onItemClick(scanResult: ScanResult) {
             this@WifiActivity.scanResult = scanResult
-            ssidEdit.setText(scanResult.SSID)
-            passwordEdit.setText("")
+            binding.ssidEdit.setText(scanResult.SSID)
+            binding.passwordEdit.setText("")
         }
     })
     private var connectDisposable: Disposable? = null
     private var checkWifiConnectedDisposable: Disposable? = null
+    private lateinit var binding: ActivityWifiBinding
 
-    private lateinit var rxPermissions: RxPermissions
+    private val permissionRequester = PermissionRequester()
+
+    init {
+        registerPermissionRequester(permissionRequester)
+    }
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_wifi)
+        binding = ActivityWifiBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         checkWifiConnected()
-        rxPermissions = RxPermissions(this)
 
-        wifiList.adapter = wifiAdapter
+        binding.wifiList.adapter = wifiAdapter
 
-        scanBtn.setOnClickListener {
+        binding.scanBtn.setOnClickListener {
             scan()
         }
-        connectBtn.setOnClickListener {
+        binding.connectBtn.setOnClickListener {
             scanResult?.let {
                 connect(it)
             }
         }
-        removeBtn.setOnClickListener {
+        binding.removeBtn.setOnClickListener {
             scanResult?.let {
                 remove(it)
             }
@@ -93,15 +97,8 @@ class WifiActivity : AppCompatActivity() {
     }
 
     private fun scan() {
-        rxPermissions.requestEachCombined(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-            .firstOrError()
-            .flatMap { permission ->
-                if(permission.granted) {
-                    RxWifiManager.scan(this, false)
-                } else {
-                    Single.error(IllegalStateException("permission is not granted"))
-                }
-            }
+        permissionRequester.requestPermissionCompletable(this, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+            .andThen(RxWifiManager.scan(this, false))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Log.e("!!!", "onScan:${it.map { it.SSID }.toTypedArray().contentToString()}")
@@ -116,15 +113,8 @@ class WifiActivity : AppCompatActivity() {
             return
         }
 
-        connectDisposable = rxPermissions.requestEachCombined(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-            .firstOrError()
-            .flatMapObservable { permission ->
-                if(permission.granted) {
-                    RxWifiManager.connectWifi(this, scanResult.SSID, passwordEdit.text.toString())
-                } else {
-                    Observable.error(IllegalStateException("permission is not granted"))
-                }
-            }
+        connectDisposable = permissionRequester.requestPermissionCompletable(this, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+            .andThen(RxWifiManager.connectWifi(this, scanResult.SSID, binding.passwordEdit.text.toString()))
                 .doFinally {
                     connectDisposable = null
                 }

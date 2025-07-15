@@ -3,23 +3,26 @@ package com.algorigo.algorigoutils
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import com.algorigo.algorigoutils.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        dateTimeUtilBtn.setOnClickListener {
+        binding.dateTimeUtilBtn.setOnClickListener {
             val intent = Intent(this, DateTimeUtilActivity::class.java)
             startActivity(intent)
         }
-        loginValidationBtn.setOnClickListener {
+        binding.loginValidationBtn.setOnClickListener {
             val intent = Intent(this, LoginValidationActivity::class.java)
             startActivity(intent)
         }
-        wifiBtn.setOnClickListener {
+        binding.wifiBtn.setOnClickListener {
             val intent = Intent(this, WifiActivity::class.java)
             startActivity(intent)
         }
