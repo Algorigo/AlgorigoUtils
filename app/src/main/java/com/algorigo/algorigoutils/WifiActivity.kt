@@ -13,7 +13,13 @@ import com.algorigo.library.rx.PermissionRequester
 import com.algorigo.library.rx.RxWifiManager
 import com.algorigo.library.rx.registerPermissionRequester
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import java.io.BufferedInputStream
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class WifiActivity : AppCompatActivity() {
 
@@ -57,6 +63,20 @@ class WifiActivity : AppCompatActivity() {
             scanResult?.let {
                 remove(it)
             }
+        }
+        binding.testBtn.setOnClickListener {
+            Single.fromCallable {
+                val url = URL("https://naver.com")
+                val connection = url.openConnection()
+                val input = BufferedInputStream(connection.getInputStream())
+                input?.readBytes()?.toString(Charsets.UTF_8) ?: ""
+            }
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    Log.e("!!!", "onTest: ${it.substring(0..100)}")
+                }, {
+                    Log.e("!!!", "error", it)
+                })
         }
     }
 
