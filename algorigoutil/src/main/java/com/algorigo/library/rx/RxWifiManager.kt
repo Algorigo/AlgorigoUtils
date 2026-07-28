@@ -1,5 +1,7 @@
 package com.algorigo.library.rx
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,6 +11,7 @@ import android.net.wifi.*
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
@@ -30,6 +33,7 @@ object RxWifiManager {
         val subject = PublishSubject.create<List<ScanResult>>()
         val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val receiver = object : BroadcastReceiver() {
+            @SuppressLint("MissingPermission")
             override fun onReceive(con: Context?, intent: Intent?) {
                 if (intent?.action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                     var result = wifiManager.scanResults
@@ -120,8 +124,8 @@ object RxWifiManager {
                     .doFinally {
                         connectivityManager.unregisterNetworkCallback(callback)
 
-                        val network = connectivityManager?.activeNetwork
-                        val result = connectivityManager?.bindProcessToNetwork(network)
+                        val network = connectivityManager.activeNetwork
+                        val result = connectivityManager.bindProcessToNetwork(network)
 
                         Log.e(LOG_TAG, "unregister bindProcessToNetwork result:$result")
                     }

@@ -5,16 +5,19 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
+import com.algorigo.algorigoutils.databinding.ActivityLoginValidationBinding
 import com.algorigo.library.LoginValidateUtil
-import kotlinx.android.synthetic.main.activity_login_validation.*
 
 class LoginValidationActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityLoginValidationBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login_validation)
+        binding = ActivityLoginValidationBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        emailEdit.addTextChangedListener(object : TextWatcher {
+        binding.emailEdit.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
 
             }
@@ -27,10 +30,10 @@ class LoginValidationActivity : AppCompatActivity() {
                 validate()
             }
         })
-        clearEmailBtn.setOnClickListener {
-            emailEdit.setText("")
+        binding.clearEmailBtn.setOnClickListener {
+            binding.emailEdit.setText("")
         }
-        passwordEdit.addTextChangedListener(object : TextWatcher {
+        binding.passwordEdit.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
 
             }
@@ -43,29 +46,29 @@ class LoginValidationActivity : AppCompatActivity() {
                 validate()
             }
         })
-        clearPasswordBtn.setOnClickListener {
-            passwordEdit.setText("")
+        binding.clearPasswordBtn.setOnClickListener {
+            binding.passwordEdit.setText("")
         }
         validate()
     }
 
     private fun validate() {
-        val email = emailEdit.text.toString()
-        val password = passwordEdit.text.toString()
+        val email = binding.emailEdit.text.toString()
+        val password = binding.passwordEdit.text.toString()
 
         val result = LoginValidateUtil.validate(email, password)
         when (result) {
             LoginValidateUtil.ValidationResult.LOGIN_VALIDATION_OK -> {
-                validationResultView.setText("Validation OK")
-                validationResultView.setTextColor(Color.GREEN)
+                binding.validationResultView.setText("Validation OK")
+                binding.validationResultView.setTextColor(Color.GREEN)
             }
             LoginValidateUtil.ValidationResult.EMAIL_VALIDATION_FAIL -> {
-                validationResultView.setText("Email is wrong")
-                validationResultView.setTextColor(Color.RED)
+                binding.validationResultView.setText("Email is wrong")
+                binding.validationResultView.setTextColor(Color.RED)
             }
             LoginValidateUtil.ValidationResult.PASSWORD_VALIDATION_FAIL -> {
-                validationResultView.setText("Password is wrong")
-                validationResultView.setTextColor(Color.RED)
+                binding.validationResultView.setText("Password is wrong")
+                binding.validationResultView.setTextColor(Color.RED)
             }
         }
     }
