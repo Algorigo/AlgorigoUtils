@@ -1,5 +1,9 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'signing'
+    id "org.jreleaser" version "1.25.0"
+}
 
 def getCurrentGitBranch() {
     def gitBranch = "Unknown branch"
@@ -19,21 +23,21 @@ def getUserName() {
     return System.properties['user.name']
 }
 
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-
 group = "com.algorigo.library"
 def archivesBaseName = "algorigoutil"
+def versionName
 if (getCurrentGitBranch() == 'master') {
-    version = versionStr
+    versionName = versionStr
 } else {
-    version = "${versionStr}-${getUserName()}-SNAPSHOT"
+    versionName = "${versionStr}-${getUserName()}-SNAPSHOT"
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            groupId = group
             artifactId = archivesBaseName
+            version = versionName
             pom {
                 name = 'AlgorigoUtil'
                 description = 'Algorigo Utility Library'
@@ -65,11 +69,8 @@ publishing {
     }
     repositories {
         maven {
-            url = version.endsWith('SNAPSHOT') ? NEXUS_SNAPSHOT_REPOSITORY_URL : NEXUS_REPOSITORY_URL
-            credentials {
-                username = findProperty('nexusUsername')
-                password = findProperty('nexusPassword')
-            }
+            name = "stagingDeploy"
+            url = layout.buildDirectory.dir("staging-deploy").get()
         }
     }
 }
